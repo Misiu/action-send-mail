@@ -36,13 +36,7 @@ END_OF_MESSAGE
 # Send
 begin
   smtp = Net::SMTP.new(server_address, server_port.to_i)
-
-  if tls == true
-    smtp.enable_tls
-  else
-    smtp.disable_tls
-  end
-
+  smtp.enable_tls if tls == 'true'
   smtp.start(server_address, username, password, :login)
   smtp.send_message(message, username, to.split(','))
 rescue StandardError => e
