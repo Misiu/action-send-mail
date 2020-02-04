@@ -39,6 +39,8 @@ begin
 
   if tls == true
     smtp.enable_tls
+  else
+    smtp.disable_tls
   end
 
   smtp.start(server_address, username, password, :login)
