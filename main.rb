@@ -1,7 +1,24 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'net/smtp'
+#https://stackoverflow.com/a/16043385/965722
+def load_gem(name, version=nil)
+  # needed if your ruby version is less than 1.9
+  require 'rubygems'
+
+  begin
+    gem name, version
+  rescue LoadError
+    version = "--version '#{version}'" unless version.nil?
+    system("gem install #{name} #{version}")
+    Gem.clear_paths
+    retry
+  end
+
+  require name
+end
+
+load_gem 'mail'
 
 # Inputs
 server_address = ENV['INPUT_SERVER_ADDRESS']
@@ -13,7 +30,6 @@ body = ENV['INPUT_BODY']
 to = ENV['INPUT_TO']
 from = ENV['INPUT_FROM']
 content_type = ENV['INPUT_CONTENT_TYPE'] || 'text/plain'
-tls = ENV['INPUT_TLS'] || true
 
 # Body
 prefix = 'file://'
@@ -24,21 +40,21 @@ body = if body.start_with?(prefix)
          body
        end
 
-# Message
-message = <<~END_OF_MESSAGE
-  Content-Type: #{content_type}; charset=utf-8
-  Subject: #{subject}
-  From: #{from} <#{username}>
-
-  #{body}
-END_OF_MESSAGE
-
 # Send
 begin
-  smtp = Net::SMTP.new(server_address, server_port.to_i)
-  smtp.enable_tls if tls == 'true'
-  smtp.start(server_address, username, password, :login)
-  smtp.send_message(message, username, to.split(','))
+  Mail.defaults do
+  delivery_method :smtp, address: server_address, port: server_port, user_name: username, password: password, enable_ssl: true, authentication: 'login'
+  end
+         
+  mail = Mail.new do
+    from from
+    to to
+    subject subject
+    body body
+  end
+
+  mail.deliver
+
 rescue StandardError => e
   puts "Error: #{e.message}"
   exit 1
