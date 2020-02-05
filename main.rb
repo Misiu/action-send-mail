@@ -40,7 +40,9 @@ body = if body.start_with?(prefix)
          body
        end
 
+puts "Body: #{body}"
 body = body.gsub('\r\n', '<br />')
+puts "Body: #{body}"
 
 # Send
 begin
