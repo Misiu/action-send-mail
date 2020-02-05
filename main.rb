@@ -47,10 +47,19 @@ begin
   end
          
   mail = Mail.new do
-    from from
     to to
+    from from
     subject subject
-    body body
+    
+    text_part do
+      body body
+    end
+
+    html_part do
+      content_type 'text/html; charset=UTF-8'
+      body body
+    end
+    
   end
 
   mail.deliver
