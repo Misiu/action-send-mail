@@ -41,7 +41,7 @@ body = if body.start_with?(prefix)
        end
 
 puts "Body: #{body}"
-body = body.gsub('\r\n', '<br />')
+body = body.gsub(/\n/, '<br/>')
 puts "Body: #{body}"
 
 # Send
