@@ -40,6 +40,8 @@ body = if body.start_with?(prefix)
          body
        end
 
+body = body.gsub('\r\n', '<br />')
+
 # Send
 begin
   Mail.defaults do
